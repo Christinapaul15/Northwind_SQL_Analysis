@@ -47,13 +47,19 @@ The queries answer real-world business questions such as:
 
 - **Monthly Sales Trends**
   ```sql
-  SELECT DATE_TRUNC('month', order_date) AS month,
-         SUM(unit_price * quantity) AS total_sales,
-         SUM(SUM(unit_price * quantity)) OVER (ORDER BY DATE_TRUNC('month', order_date)) AS running_total
-  FROM orders
-  JOIN order_details USING(order_id)
-  GROUP BY month
-  ORDER BY month;
+  SELECT 
+    DATE_TRUNC('month', o.order_date) AS month,
+    SUM(od.unit_price * od.quantity) AS monthly_sales,
+    SUM(SUM(od.unit_price * od.quantity)) OVER (ORDER BY DATE_TRUNC('month', o.order_date)) AS running_total
+FROM 
+    orders AS o
+JOIN 
+    order_details AS od
+    ON o.order_id = od.order_id
+GROUP BY 
+    DATE_TRUNC('month', o.order_date)
+ORDER BY 
+    month; 
 Top 3 Products by Category
 
 sql
