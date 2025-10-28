@@ -50,16 +50,13 @@ The queries answer real-world business questions such as:
   SELECT 
     DATE_TRUNC('month', o.order_date) AS month,
     SUM(od.unit_price * od.quantity) AS monthly_sales,
-    SUM(SUM(od.unit_price * od.quantity)) OVER (ORDER BY DATE_TRUNC('month', o.order_date)) AS running_total
-FROM 
-    orders AS o
-JOIN 
-    order_details AS od
-    ON o.order_id = od.order_id
-GROUP BY 
-    DATE_TRUNC('month', o.order_date)
-ORDER BY 
-    month; 
+    SUM(SUM(od.unit_price * od.quantity))
+  OVER (ORDER BY DATE_TRUNC('month', o.order_date)) AS running_total
+FROM orders AS o
+JOIN order_details AS od
+ ON o.order_id = od.order_id
+GROUP BY  DATE_TRUNC('month', o.order_date)
+ORDER BY month; 
 Top 3 Products by Category
 
 sql
