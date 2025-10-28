@@ -14,61 +14,42 @@ The queries answer real-world business questions such as:
 - Which employees and customers contribute the most to revenue?
 - Which product categories and products generate the highest sales?
 - What percentage of total sales does each category represent?
-- How do individual orders compare to the overall average?
 
 ---
 
 ## 🛠️ Tools & Technologies
-- **SQL** (PostgreSQL syntax)
+- **SQL** (PostgreSQL)
 - **Jupyter Notebook**
 - **Northwind Sample Database**
-- **Python** (via Jupyter for SQL execution)
+- **Python** (for query execution and analysis)
 - **CTEs**, **Window Functions**, **Joins**, **Aggregations**, **CASE statements**
 
 ---
 
 ## 🧩 Key Concepts Applied
 
-1. **Common Table Expressions (CTEs)**  
-   Simplified complex queries and modularized logic for better readability.
-
-2. **Window Functions**  
-   Used `ROW_NUMBER()`, `RANK()`, `LAG()`, and `SUM() OVER()` to calculate rankings, growth trends, and running totals.
-
-3. **Data Aggregation & Categorization**  
-   Calculated KPIs like total revenue, percentage contribution, and average order values.
-
-4. **Performance Insights**  
-   Identified top-performing employees, customers, and products based on sales.
+1. **Common Table Expressions (CTEs)** — To simplify multi-step logic into modular queries.  
+2. **Window Functions** — For calculating running totals, rankings, and growth rates.  
+3. **Aggregations & Grouping** — To summarize key business metrics.  
+4. **Data Cleaning & Joins** — To combine data across multiple related tables.
 
 ---
 
-## 🧾 Example Highlights
+## 📈 Example Query — Monthly Sales & Running Total
 
-- **Monthly Sales Trends**
-  ```sql
-  SELECT 
+The following query calculates **monthly sales** and a **running total** across months using the `SUM()` function with an `OVER()` clause:
+
+```sql
+SELECT 
     DATE_TRUNC('month', o.order_date) AS month,
     SUM(od.unit_price * od.quantity) AS monthly_sales,
-    SUM(SUM(od.unit_price * od.quantity))
-  OVER (ORDER BY DATE_TRUNC('month', o.order_date)) AS running_total
-FROM orders AS o
-JOIN order_details AS od
- ON o.order_id = od.order_id
-GROUP BY  DATE_TRUNC('month', o.order_date)
-ORDER BY month; 
-Top 3 Products by Category
-
-sql
-Copy code
-WITH product_sales AS (
-  SELECT category_id, product_id, SUM(quantity * unit_price) AS total_sales
-  FROM products
-  JOIN order_details USING(product_id)
-  GROUP BY category_id, product_id
-)
-SELECT * FROM (
-  SELECT *, ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY total_sales DESC) AS rank
-  FROM product_sales
-) ranked
-WHERE rank <= 3;
+    SUM(SUM(od.unit_price * od.quantity)) OVER (ORDER BY DATE_TRUNC('month', o.order_date)) AS running_total
+FROM 
+    orders AS o
+JOIN 
+    order_details AS od
+    ON o.order_id = od.order_id
+GROUP BY 
+    DATE_TRUNC('month', o.order_date)
+ORDER BY 
+    month;
